@@ -14,7 +14,8 @@ const productSchema = new mongoose.Schema({
             url: String,
             id: String
         }
-    ]
+    ],
+    email: String
 });
 
 

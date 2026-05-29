@@ -1,14 +1,24 @@
-// Importing the modules 
-import { ImageKit } from "@imagekit/nodejs/client.js";
-import client from "../config/imagekit.config";
+// Importing the modules
+import { toFile } from "@imagekit/nodejs";
+import client from "../config/imagekit.config.js";
+import ApiError from "../utils/ApiError.util.js";
 
-// Funciton to upload the image
-function uploadImage(file) {
+// Function to upload the image
+async function uploadImage(file) {
 
-    // Setting the parameters to uplaod a file
+    if (!file?.buffer) {
+        throw new ApiError(400, "Image file is missing");
+    }
+
+    const fileName = `${Date.now()}-${file.originalname}`;
+    const uploadableFile = await toFile(file.buffer, fileName, {
+        type: file.mimetype
+    });
+
+    // Setting the parameters to upload a file
     const params = {
-        file: file.buffer,
-        fileName: `${Date.now()}-${file.originalName}`,
+        file: uploadableFile,
+        fileName,
     };
 
     // Uploading and getting the response

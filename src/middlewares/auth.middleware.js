@@ -8,8 +8,6 @@ function authMiddleware(req, res, next) {
     // accepting data
     let token = req.cookies.product_token;
 
-    console.log(token)
-
     // if there is not token then move to next controller
     if (token == undefined) return next();
 
