@@ -1,7 +1,8 @@
 // Importing the app
 import app from "./src/app.js";
+import envs from "./src/config/env.config.js";
 
 // Starting the server
-app.listen(5000, () => {
-    console.log(`Server Is running on port 5000`);
+app.listen(envs.PORT, () => {
+    console.log(`Server Is running on port ${envs.PORT}`);
 });
