@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Adding the pre function to hash the password
-userSchema.pre("save", function () {
+userSchema.pre("save", function() {
 
     // Checking if password is already hashed or not
     if (this.isModified("password")) return;
@@ -23,7 +23,7 @@ userSchema.pre("save", function () {
 });
 
 // Making a method to generate a JWT
-userSchema.methods.generateJWT = function () {
+userSchema.methods.generateJWT = function() {
 
     // generating and returning the jwt token
     return jwt.sign({
