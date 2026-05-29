@@ -3,6 +3,7 @@ import express from "express";
 import connectDB from "./config/db.config.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
+import mainRouter from "./router/main.router.js";
 
 // Initializing the app
 const app = express();
@@ -14,6 +15,9 @@ app.use(cookieParser());
 // Connecting to the DB
 await connectDB();
 
-app.use(errorMiddleware)
+// adding the /api router
+app.use("/api", mainRouter);
+
+app.use(errorMiddleware);
 
 export default app;
