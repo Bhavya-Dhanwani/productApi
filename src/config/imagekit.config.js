@@ -6,4 +6,4 @@ const client = new ImageKit({
     privateKey: envs.IMAGEKIT_PRIVATE_KEY, // Given the private key
 });
 
-export default ImageKit;
+export default client;
