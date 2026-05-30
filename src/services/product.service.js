@@ -6,7 +6,7 @@ import { delteImage, uploadImage } from "./imagekit.service.js";
 import ApiError from "../utils/ApiError.util.js";
 
 // Making the function to create a product
-async function createService(files, name, description, price, catageorys) {
+async function createService(files, name, description, price, catageory) {
 
     // validating the data of the product
     validateProductData(name, description, price, catageory, files);
@@ -41,6 +41,9 @@ async function getAllProducts(catageory = null) {
 
 async function getByIdService(id) {
 
+    // Validating id
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(400, "Ivalid Product id");
+
     // fetching the product by id
     const product = await productModel.findById(id);
 
@@ -61,7 +64,7 @@ async function updateService(files, name, description, price, catageory, id) {
 
     // return if product not there
     if (!product) throw new ApiError(404, "Product not found");
-    
+
     // Deleting old images to maintain the storage so that on image change the old images disappear
     for (let i = 0; i < product.images.length; i++) {
         const res = await delteImage(product.images[i].id);
@@ -85,4 +88,28 @@ async function updateService(files, name, description, price, catageory, id) {
 
 }
 
-export { createService, getAllProducts, getByIdService, updateService }
+async function delteService(id) {
+
+    // Validating id
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(400, "Ivalid Product id");
+
+    // Finding the product
+    const product = await productModel.findById(id);
+
+    // return if product not there
+    if (!product) throw new ApiError(404, "Product not found");
+
+    // Deleting images to save storage
+    for (let i = 0; i < product.images.length; i++) {
+        const res = await delteImage(product.images[i].id);
+        if (!res) throw new ApiError(500, "Internal Server Error");
+    }
+
+    // Delteing the item
+    await productModel.findByIdAndDelete(id);
+
+    return true;
+
+}
+
+export { createService, getAllProducts, getByIdService, updateService, delteService }

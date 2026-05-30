@@ -1,5 +1,5 @@
 // Importing modules
-import { createService, getAllProducts, getByIdService, updateService } from "../services/product.service.js";
+import { createService, delteService, getAllProducts, getByIdService, updateService } from "../services/product.service.js";
 import ApiError from "../utils/ApiError.util.js";
 import ApiResponse from "../utils/ApiResponse.util.js";
 
@@ -74,4 +74,22 @@ async function UpdateProducts(req, res) {
     return ApiResponse(res, 201, "Product created successfully", product);
 }
 
-export { createProduct, getProducts, getProductByID, UpdateProducts };
+async function deleteProduct(req, res) {
+
+    // Authorizing the user
+    if (!req.user) {
+        throw new ApiError(409, "User unauthorized");
+    }
+
+    // accepting data
+    const id = req.params.id;
+
+    // using the delte Service
+    await delteService(id);
+
+    // Sending the response
+    return ApiResponse(res, 204, "Delted the product successfully");
+
+}
+
+export { createProduct, getProducts, getProductByID, UpdateProducts, deleteProduct };
