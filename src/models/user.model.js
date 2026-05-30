@@ -3,16 +3,24 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import envs from "../config/env.config.js";
+import { type } from "node:os";
 
 // Schema for the user to save in the database
 const userSchema = new mongoose.Schema({
-    name: String,
-    email: String,
+    name: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
     password: String
 });
 
 // Adding the pre function to hash the password
-userSchema.pre("save", function() {
+userSchema.pre("save", function () {
 
     // Checking if password is already hashed or not
     if (this.isModified("password")) return;
@@ -23,7 +31,7 @@ userSchema.pre("save", function() {
 });
 
 // Making a method to generate a JWT
-userSchema.methods.generateJWT = function() {
+userSchema.methods.generateJWT = function () {
 
     // generating and returning the jwt token
     return jwt.sign({
@@ -37,7 +45,7 @@ userSchema.methods.generateJWT = function() {
 }
 
 // Making a method to compare the password
-userSchema.methods.comparePassword = function(password) {
+userSchema.methods.comparePassword = function (password) {
 
     // Comparing the passwords
     return bcrypt.compareSync(password, this.password);

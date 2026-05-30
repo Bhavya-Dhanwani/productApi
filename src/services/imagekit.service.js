@@ -6,11 +6,15 @@ import ApiError from "../utils/ApiError.util.js";
 // Function to upload the image
 async function uploadImage(file) {
 
+    // Checking if the file buffer is original or a fake string
     if (!file?.buffer) {
         throw new ApiError(400, "Image file is missing");
     }
 
+    // Setting a unique file name
     const fileName = `${Date.now()}-${file.originalname}`;
+
+    // Makeing the file uploadable as per the new imagekit version
     const uploadableFile = await toFile(file.buffer, fileName, {
         type: file.mimetype
     });
@@ -32,5 +36,14 @@ async function uploadImage(file) {
 
 }
 
+async function delteImage(id) {
 
-export { uploadImage };
+    // Deleting images by using id
+    await client.files.delete(id);
+
+    return true;
+
+}
+
+
+export { uploadImage, delteImage };

@@ -1,15 +1,11 @@
 import ApiError from "../utils/ApiError.util.js";
 
 // Made function to validate the input data
-function validateProductData(name, email, description, price, catageory, files) {
+function validateProductData(name, description, price, catageory, files) {
 
     // validations
     if (!name) {
         throw new ApiError(400, "Name is required");
-    }
-
-    if (!email) {
-        throw new ApiError(400, "Email is required");
     }
 
     if (!description) {
