@@ -48,4 +48,41 @@ async function getByIdService(id) {
 
 }
 
-export { createService, getAllProducts, getByIdService }
+async function updateService(files, name, description, price, catageory, id) {
+
+    // Validating id
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(400, "Ivalid Product id");
+
+    // validating the data of the product
+    validateProductData(name, description, price, catageory, files);
+
+    // Fetchinf the product from the DB 
+    const product = await productModel.findById(id);
+
+    // return if product not there
+    if (!product) throw new ApiError(404, "Product not found");
+    
+    // Deleting old images to maintain the storage so that on image change the old images disappear
+    for (let i = 0; i < product.images.length; i++) {
+        const res = await delteImage(product.images[i].id);
+        if (!res) throw new ApiError(500, "Internal Server Error");
+    }
+
+    // uploading images to imagekit
+    const uploads = await Promise.all(files.map(file => uploadImage(file)));
+
+    // Updating products
+    product.images = uploads;
+    product.name = name;
+    product.description = description;
+    product.price = price;
+    product.catageory = catageory
+
+    // Saving the product
+    product.save();
+
+    return product;
+
+}
+
+export { createService, getAllProducts, getByIdService, updateService }

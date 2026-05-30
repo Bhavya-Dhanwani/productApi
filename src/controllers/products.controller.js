@@ -1,5 +1,5 @@
 // Importing modules
-import { createService, getAllProducts, getByIdService } from "../services/product.service.js";
+import { createService, getAllProducts, getByIdService, updateService } from "../services/product.service.js";
 import ApiError from "../utils/ApiError.util.js";
 import ApiResponse from "../utils/ApiResponse.util.js";
 
@@ -56,4 +56,22 @@ async function getProductByID(req, res) {
 
 }
 
-export { createProduct, getProducts, getProductByID };
+async function UpdateProducts(req, res) {
+
+    // Accepting the data
+    if (!req.user) {
+        throw new ApiError(409, "User unauthorized");
+    }
+
+    // accepting the data
+    let { name, description, price, catageory } = req.body;
+    const id = req.params.id;
+
+    // using the service to create the product
+    const product = await updateService(req.files, name, description, price, catageory, id);
+
+    // Sending the updated product as data
+    return ApiResponse(res, 201, "Product created successfully", product);
+}
+
+export { createProduct, getProducts, getProductByID, UpdateProducts };
