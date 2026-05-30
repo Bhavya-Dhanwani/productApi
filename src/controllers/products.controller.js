@@ -1,6 +1,6 @@
 // Importing modules
-import ApiError from "../utils/ApiError.util.js";
 import { createService, getAllProducts } from "../services/product.service.js";
+import ApiError from "../utils/ApiError.util.js";
 import ApiResponse from "../utils/ApiResponse.util.js";
 
 /*
@@ -34,8 +34,10 @@ async function createProduct(req, res) {
 */
 async function getProducts(req, res) {
 
+    let catageory = req.query.catageory;
+
     // Getting all the products from the service
-    const products = await getAllProducts();
+    const products = await getAllProducts(catageory == undefined ? null : catageory);
 
     // Sending all products with res 
     return ApiResponse(res, 200, "ALl products fetced successfully", products);

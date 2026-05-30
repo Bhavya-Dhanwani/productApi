@@ -30,8 +30,11 @@ async function createService(files, name, description, price, catageorys) {
 // Funciton to get all the products
 async function getAllProducts(catageory = null) {
 
-    // Fetching all the products
-    const products = await productModel.find();
+    let products;
+
+    // Fetching all the products with conditions to apply the filters
+    if (catageory != null) products = await productModel.find({ catageory });
+    else products = await productModel.find();
 
     return products;
 }
