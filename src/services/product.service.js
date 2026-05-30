@@ -39,4 +39,13 @@ async function getAllProducts(catageory = null) {
     return products;
 }
 
-export { createService, getAllProducts }
+async function getByIdService(id) {
+
+    // fetching the product by id
+    const product = await productModel.findById(id);
+
+    return product;
+
+}
+
+export { createService, getAllProducts, getByIdService }

@@ -1,5 +1,5 @@
 // Importing modules
-import { createService, getAllProducts } from "../services/product.service.js";
+import { createService, getAllProducts, getByIdService } from "../services/product.service.js";
 import ApiError from "../utils/ApiError.util.js";
 import ApiResponse from "../utils/ApiResponse.util.js";
 
@@ -43,4 +43,17 @@ async function getProducts(req, res) {
     return ApiResponse(res, 200, "ALl products fetced successfully", products);
 }
 
-export { createProduct, getProducts };
+async function getProductByID(req, res) {
+
+    // accepting the data
+    const id = req.params.id;
+
+    // Using service to get the data
+    const product = await getByIdService(id);
+
+    // Sending the product with res 
+    return ApiResponse(res, 200, "Product fetced successfully", product);
+
+}
+
+export { createProduct, getProducts, getProductByID };
