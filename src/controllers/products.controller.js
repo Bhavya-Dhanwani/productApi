@@ -29,7 +29,7 @@ async function createProduct(req, res) {
 /*
 @Route get
 @access public
-@use to get the products
+@use to get the products all and as per catageory 
 @Type GET
 */
 async function getProducts(req, res) {
@@ -43,6 +43,12 @@ async function getProducts(req, res) {
     return ApiResponse(res, 200, "ALl products fetced successfully", products);
 }
 
+/*
+@Route get
+@access public
+@use to get the product by id
+@Type GET
+*/
 async function getProductByID(req, res) {
 
     // accepting the data
@@ -56,6 +62,12 @@ async function getProductByID(req, res) {
 
 }
 
+/*
+@Route update
+@access public
+@use to update products
+@Type PUT
+*/
 async function UpdateProducts(req, res) {
 
     // Accepting the data
@@ -74,6 +86,12 @@ async function UpdateProducts(req, res) {
     return ApiResponse(res, 201, "Product created successfully", product);
 }
 
+/*
+@Route delete
+@access private
+@use to delte a product
+@Type DELETE
+*/
 async function deleteProduct(req, res) {
 
     // Authorizing the user
