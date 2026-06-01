@@ -1,5 +1,6 @@
 // Importing modules
 import { createService, delteService, getAllProducts, getByIdService, updateService } from "../services/product.service.js";
+import { getUploadAuthentication } from "../services/imagekit.service.js";
 import ApiError from "../utils/ApiError.util.js";
 import ApiResponse from "../utils/ApiResponse.util.js";
 
@@ -17,10 +18,10 @@ async function createProduct(req, res) {
     }
 
     // accepting the data
-    let { name, description, price, catageory } = req.body;
+    let { name, description, price, catageory, images } = req.body;
 
     // using the service to create the product
-    const product = await createService(req.files, name, description, price, catageory);
+    const product = await createService(images, name, description, price, catageory);
 
     return ApiResponse(res, 201, "Product created successfully", product);
 
@@ -76,14 +77,32 @@ async function UpdateProducts(req, res) {
     }
 
     // accepting the data
-    let { name, description, price, catageory } = req.body;
+    let { name, description, price, catageory, images } = req.body;
     const id = req.params.id;
 
     // using the service to create the product
-    const product = await updateService(req.files, name, description, price, catageory, id);
+    const product = await updateService(images, name, description, price, catageory, id);
 
     // Sending the updated product as data
     return ApiResponse(res, 201, "Product created successfully", product);
+}
+
+/*
+@Route upload-auth
+@access private
+@use to get signed ImageKit upload authentication params
+@Type GET
+*/
+async function getUploadAuth(req, res) {
+
+    // Authorizing the user
+    if (!req.user) {
+        throw new ApiError(409, "User unauthorized");
+    }
+
+    const authParams = getUploadAuthentication();
+
+    return ApiResponse(res, 200, "Upload auth generated successfully", authParams);
 }
 
 /*
@@ -110,4 +129,4 @@ async function deleteProduct(req, res) {
 
 }
 
-export { createProduct, getProducts, getProductByID, UpdateProducts, deleteProduct };
+export { createProduct, getProducts, getProductByID, UpdateProducts, deleteProduct, getUploadAuth };

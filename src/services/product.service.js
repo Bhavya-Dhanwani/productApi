@@ -2,17 +2,14 @@
 import mongoose from "mongoose";
 import productModel from "../models/product.model.js";
 import validateProductData from "../validators/product.validate.js";
-import { delteImage, uploadImage } from "./imagekit.service.js";
+import { delteImage } from "./imagekit.service.js";
 import ApiError from "../utils/ApiError.util.js";
 
 // Making the function to create a product
-async function createService(files, name, description, price, catageory) {
+async function createService(images, name, description, price, catageory) {
 
     // validating the data of the product
-    validateProductData(name, description, price, catageory, files);
-
-    // uploading images to imagekit
-    const uploads = await Promise.all(files.map(file => uploadImage(file)));
+    const validImages = validateProductData(name, description, price, catageory, images);
 
     // Adding the product in the databse
     const product = await productModel.create({
@@ -20,7 +17,7 @@ async function createService(files, name, description, price, catageory) {
         description,
         price,
         catageory,
-        images: uploads
+        images: validImages
     });
 
     return product;
@@ -51,13 +48,10 @@ async function getByIdService(id) {
 
 }
 
-async function updateService(files, name, description, price, catageory, id) {
+async function updateService(images, name, description, price, catageory, id) {
 
     // Validating id
     if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(400, "Ivalid Product id");
-
-    // validating the data of the product
-    validateProductData(name, description, price, catageory, files);
 
     // Fetchinf the product from the DB 
     const product = await productModel.findById(id);
@@ -65,24 +59,31 @@ async function updateService(files, name, description, price, catageory, id) {
     // return if product not there
     if (!product) throw new ApiError(404, "Product not found");
 
-    // Deleting old images to maintain the storage so that on image change the old images disappear
-    for (let i = 0; i < product.images.length; i++) {
-        const res = await delteImage(product.images[i].id);
-        if (!res) throw new ApiError(500, "Internal Server Error");
+    // validating the data of the product
+    const validImages = validateProductData(name, description, price, catageory, images, { requireImages: false });
+
+    if (validImages) {
+        const newImageIds = new Set(validImages.map(image => image.id));
+
+        // Deleting replaced images to maintain storage
+        for (let i = 0; i < product.images.length; i++) {
+            if (newImageIds.has(product.images[i].id)) continue;
+
+            const res = await delteImage(product.images[i].id);
+            if (!res) throw new ApiError(500, "Internal Server Error");
+        }
+
+        product.images = validImages;
     }
 
-    // uploading images to imagekit
-    const uploads = await Promise.all(files.map(file => uploadImage(file)));
-
     // Updating products
-    product.images = uploads;
     product.name = name;
     product.description = description;
     product.price = price;
     product.catageory = catageory
 
     // Saving the product
-    product.save();
+    await product.save();
 
     return product;
 

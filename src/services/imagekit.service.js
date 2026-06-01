@@ -1,39 +1,12 @@
-// Importing the modules
-import { toFile } from "@imagekit/nodejs";
 import client from "../config/imagekit.config.js";
-import ApiError from "../utils/ApiError.util.js";
+import envs from "../config/env.config.js";
 
-// Function to upload the image
-async function uploadImage(file) {
-
-    // Checking if the file buffer is original or a fake string
-    if (!file?.buffer) {
-        throw new ApiError(400, "Image file is missing");
-    }
-
-    // Setting a unique file name
-    const fileName = `${Date.now()}-${file.originalname}`;
-
-    // Makeing the file uploadable as per the new imagekit version
-    const uploadableFile = await toFile(file.buffer, fileName, {
-        type: file.mimetype
-    });
-
-    // Setting the parameters to upload a file
-    const params = {
-        file: uploadableFile,
-        fileName,
-    };
-
-    // Uploading and getting the response
-    const response = await client.files.upload(params);
-
-    // returning the url and the id
+function getUploadAuthentication() {
     return {
-        url: response.url,
-        id: response.fileId
+        ...client.helper.getAuthenticationParameters(),
+        publicKey: envs.IMAGEKIT_PUBLIC_KEY,
+        urlEndpoint: envs.URL_ENDPOINT
     };
-
 }
 
 async function delteImage(id) {
@@ -46,4 +19,4 @@ async function delteImage(id) {
 }
 
 
-export { uploadImage, delteImage };
+export { getUploadAuthentication, delteImage };

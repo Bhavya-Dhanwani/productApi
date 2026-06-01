@@ -1,7 +1,55 @@
 import ApiError from "../utils/ApiError.util.js";
 
+function normalizeImages(images) {
+
+    if (typeof images == "string") {
+        try {
+            return JSON.parse(images);
+        } catch (error) {
+            throw new ApiError(400, "Images must be a valid JSON array");
+        }
+    }
+
+    return images;
+}
+
+function validateImages(images, required = true) {
+
+    const normalizedImages = normalizeImages(images);
+
+    if (!normalizedImages || normalizedImages.length == 0) {
+        if (required) throw new ApiError(400, "Images are required");
+        return undefined;
+    }
+
+    if (!Array.isArray(normalizedImages)) {
+        throw new ApiError(400, "Images must be an array");
+    }
+
+    if (normalizedImages.length > 4) {
+        throw new ApiError(400, "Only 4 images are allowed");
+    }
+
+    normalizedImages.forEach(image => {
+        if (!image?.url || !image?.id) {
+            throw new ApiError(400, "Each image must include url and id");
+        }
+
+        if (typeof image.url != "string" || typeof image.id != "string") {
+            throw new ApiError(400, "Image url and id must be strings");
+        }
+    });
+
+    return normalizedImages.map(image => ({
+        url: image.url,
+        id: image.id
+    }));
+}
+
 // Made function to validate the input data
-function validateProductData(name, description, price, catageory, files) {
+function validateProductData(name, description, price, catageory, images, options = {}) {
+
+    const { requireImages = true } = options;
 
     // validations
     if (!name) {
@@ -20,17 +68,7 @@ function validateProductData(name, description, price, catageory, files) {
         throw new ApiError(400, "Catageory is required");
     }
 
-    if (!files || files.length == 0) {
-        throw new ApiError(400, "Images are required")
-    }
-
-    // Loop to check the file type of each file
-    files.forEach(file => {
-        // Checking the file types 
-        if(file.mimetype != "image/jpeg" && file.mimetype != "image/webp" && file.mimetype != "image/png") {
-            throw new ApiError(400, "Only jpeg, jpg, webp and png images are allowed");
-        }
-    });
+    return validateImages(images, requireImages);
 
 }
 
